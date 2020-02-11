@@ -7,6 +7,9 @@
 #include "GEOFENCE.h"       // Modified version of https://github.com/TomasTT7/TT7F-Float-Tracker/blob/master/Software/ARM_GEOFENCE.c
 #include <avr/wdt.h>
 #include <EEPROM.h>
+#include "PositionMessage.h"
+#include "PositionReport.h"
+#include "UnitTests.h"
 
 #define RfPDPin     19
 #define GpsVccPin   18
@@ -30,7 +33,8 @@
 #define AprsPinInput  pinMode(12,INPUT);pinMode(13,INPUT);pinMode(14,INPUT);pinMode(15,INPUT)
 #define AprsPinOutput pinMode(12,OUTPUT);pinMode(13,OUTPUT);pinMode(14,OUTPUT);pinMode(15,OUTPUT)
 
-//#define DEVMODE // Development mode. Uncomment to enable for debugging.
+#define DEVMODE // Development mode. Uncomment to enable for debugging.
+//#define RADIOENABLE // Development mode. Uncomment to enable for radio transmission.
 
 //https://github.com/lightaprs/LightAPRS-1.0/wiki/Tips-&-Tricks-for-Pico-Balloons
 
@@ -131,6 +135,24 @@ void setup() {
 void loop() {
    wdt_reset();
   
+	UnitTests::GridIdConversion();
+	UnitTests::ReportEncoding();
+	UnitTests::MessageEncoding();
+	UnitTests::MessageWithReportsEncoding();  
+
+	int i = 1;
+	unsigned int ui = 1;
+	unsigned short us = 1;
+	unsigned long ul = 1;  
+	Serial.printf("int %d \n", sizeof(i));
+	Serial.printf("unsigned int %d \n", sizeof(ui));
+	Serial.printf("unsigned short %d \n", sizeof(us));
+	Serial.printf("unsigned long %d \n", sizeof(ul));
+
+
+  delay(10000);
+  return;
+
   if (readBatt() > BattMin) {
   
   
@@ -151,7 +173,6 @@ void loop() {
       while (readBatt() < BattMin) {
         sleepSeconds(BattWait); 
       }
-      
    }
     
     updateGpsData(1000);
@@ -449,6 +470,7 @@ void sendLocation() {
   sprintf(timestamp_buff + 2, "%02d", gps.time.isValid() ? (int)gps.time.minute() : 0);
   sprintf(timestamp_buff + 4, "%02d", gps.time.isValid() ? (int)gps.time.second() : 0);
   timestamp_buff[6] = 'h';
+#if defined(RADIOENABLE)  
   AprsPinOutput;
   RfON;
   delay(2000);
@@ -463,6 +485,7 @@ void sendLocation() {
   RfPttOFF;
   RfOFF;
   AprsPinInput;
+#endif  
 #if defined(DEVMODE)
   Serial.println(F("Location sent with comment"));
 #endif
@@ -517,7 +540,7 @@ void sendStatus() {
     
     sprintf(status_buff, "%s", StatusMessage);
   }
-  
+#if defined(RADIOENABLE)    
   AprsPinOutput;
   RfON;
   delay(2000);
@@ -531,6 +554,7 @@ void sendStatus() {
   RfPttOFF;
   RfOFF;
   AprsPinInput;
+#endif  
 #if defined(DEVMODE)
   Serial.println(F("Status sent"));
 #endif
