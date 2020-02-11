@@ -1,2 +1,3 @@
-# LightAPRS-1.0-x1
-Experimental APRS Tracker with position history reporting.
+# LightAPRS Tracker (X1)
+Forked from https://github.com/lightaprs/LightAPRS-1.0
+
