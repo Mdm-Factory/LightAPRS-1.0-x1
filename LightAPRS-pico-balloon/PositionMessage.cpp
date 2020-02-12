@@ -9,7 +9,7 @@ PositionMessage::PositionMessage() {
 
 //  New object from header values
 PositionMessage::PositionMessage(unsigned char* data, unsigned long startPos, unsigned long epoch, PositionReport::PositionTypes positionType,
-	TimeTypes timeType, int timeInterval, unsigned char reportsCount) {
+	TimeTypes timeType, int timeInterval, unsigned short reportsCount) {
 
 	_startPos = startPos;
 	_buffer = data;

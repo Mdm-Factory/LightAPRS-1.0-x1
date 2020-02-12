@@ -64,8 +64,8 @@ void  UnitTests::MessageEncoding() {
 	Serial.printf("TestMessageEncoding \n");
 	unsigned char gridLoc[4];
 	unsigned long epoch = 1581456190;
-	unsigned long reportCount = 0;
-	unsigned char timeInterval = 4;
+	unsigned short reportCount = 0;
+	unsigned short timeInterval = 4;
 	PositionMessage::TimeTypes timeType = PositionMessage::TimeTypes::hours;
 	PositionReport::PositionTypes positionType = PositionReport::PositionTypes::normalRes;
 
@@ -92,8 +92,8 @@ void  UnitTests::MessageEncoding() {
 void  UnitTests::MessageWithReportsEncoding() {
 	Serial.printf("MessageWithReportsEncoding \n");
 	unsigned long epoch = 1581456190;
-	int reportCount = 10;
-	unsigned char timeInterval = 2;
+	unsigned short  reportCount = 60;   //Need to test all 64 possible reports THERE IS A BOUNDARY BUG AT 64
+	unsigned short timeInterval = 2;
 	PositionMessage::TimeTypes timeType = PositionMessage::TimeTypes::hours;
 	PositionReport::PositionTypes positionType = PositionReport::PositionTypes::normalRes;
 
@@ -104,19 +104,19 @@ void  UnitTests::MessageWithReportsEncoding() {
 	PositionMessage message1(buffer, 0, epoch, positionType, timeType, timeInterval, reportCount);
 	for (int i=0; i < reportCount; i++) {
 		unsigned long utc = epoch + message1.TimeIntervalSeconds() * i;  // for testing, make each report the next time slot
-		PositionReport report = message1.AddReport(utc, 30.0 + i*2, -97.0 + i*2, i);
-		Serial.printf("...AddReport %lu %c%c%c%c %lu \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
+		PositionReport report = message1.AddReport(utc, 30.0 + i*2, -97.0 + i*2, (unsigned short)i);
+		Serial.printf("...AddReport %lu %c%c%c%c %d \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
 			report.GridLocation[3], report.AltMeters);
 	}
-	Serial.printf("%lu Reports Added \n", message1.ReportsCount);
+	Serial.printf("%d Reports Added \n", message1.ReportsCount);
 	
 	// Decode message
 	PositionMessage message2;
 	message2.FromBytes(buffer, 0);
-	Serial.printf("%lu Reports Read \n", message2.ReportsCount);
+	Serial.printf("%d Reports Read \n", message2.ReportsCount);
 	for (int i = 0; i < message2.ReportsCount; i++) {
 		PositionReport report = message2.ReadReport(i);
-		Serial.printf("...ReadReport %lu %c%c%c%c %lu \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
+		Serial.printf("...ReadReport %lu %c%c%c%c %d \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
 			report.GridLocation[3], report.AltMeters);
 	}
 
