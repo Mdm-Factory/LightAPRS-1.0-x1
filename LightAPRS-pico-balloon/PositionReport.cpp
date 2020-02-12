@@ -19,7 +19,7 @@ void PositionReport::FromBytes(unsigned char* data, unsigned long startPos) {
 	memcpy(&TimeIndex, &_buffer[_startPos], sizeof(TimeIndex));  //bytes  0..1
 	memcpy(&gridBytes, &_buffer[_startPos + sizeof(TimeIndex)], sizeof(gridBytes));  //bytes 2..3
 
-	Utc = Epoch + (TimeIntervalSeconds * TimeIndex);
+	Utc = (unsigned long)(Epoch + (TimeIntervalSeconds * TimeIndex));
 
 	unsigned char gridSubSqaure = gridBytes & 127;  // lower 7 bits
 	unsigned short gridId = gridBytes >> 7;
@@ -29,15 +29,16 @@ void PositionReport::FromBytes(unsigned char* data, unsigned long startPos) {
 
 	IdToGridLocator(GridLocation, gridId);
 
+	AltMeters = (unsigned short)0;  // Haven't encoded this yet.
 	// TODO:  Convert GridLocation back to Lat/Lon
 }
 
 //  Write the message to the data buffer, along with the 'count' position reports from 'startIndex'
-void PositionReport::ToBytes(unsigned char* data, unsigned long startPos, unsigned long utc, float lat, float lon, unsigned long altMeters) {
+void PositionReport::ToBytes(unsigned char* data, unsigned long startPos, unsigned long utc, float lat, float lon, unsigned short altMeters) {
 	_startPos = startPos;
 	_buffer = data;
 	Utc = utc;
-	TimeIndex = (utc - Epoch) / TimeIntervalSeconds; 
+	TimeIndex = (unsigned short)((utc - Epoch) / TimeIntervalSeconds); 
 
 	Lat = lat;
 	Lon = lon;
@@ -53,14 +54,14 @@ void PositionReport::ToBytes(unsigned char* data, unsigned long startPos, unsign
 	AltMeters = altMeters;
 }
 
-int PositionReport::ByteSize() {
+unsigned short PositionReport::ByteSize() {
 	return ByteSize(PositionType);
 }
 
 // STATIC Functions
 
 // Convert Timetype/TimeInterval into interval in seconds
-int PositionReport::ByteSize(PositionTypes positionType) {
+unsigned short PositionReport::ByteSize(PositionTypes positionType) {
 	switch (positionType) {
 	//case lowRes: return ?;
 	case normalRes: return 4;

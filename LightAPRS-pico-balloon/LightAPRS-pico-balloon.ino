@@ -135,22 +135,11 @@ void setup() {
 void loop() {
    wdt_reset();
   
-	UnitTests::GridIdConversion();
+	//UnitTests::GridIdConversion();
 	UnitTests::ReportEncoding();
 	UnitTests::MessageEncoding();
 	UnitTests::MessageWithReportsEncoding();  
-
-	int i = 1;
-	unsigned int ui = 1;
-	unsigned short us = 1;
-	unsigned long ul = 1;  
-	Serial.printf("int %d \n", sizeof(i));
-	Serial.printf("unsigned int %d \n", sizeof(ui));
-	Serial.printf("unsigned short %d \n", sizeof(us));
-	Serial.printf("unsigned long %d \n", sizeof(ul));
-
-
-  delay(10000);
+  delay(30000);
   return;
 
   if (readBatt() > BattMin) {

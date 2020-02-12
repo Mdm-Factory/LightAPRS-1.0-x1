@@ -20,7 +20,7 @@ PositionMessage::PositionMessage(unsigned char* data, unsigned long startPos, un
 	TimeInterval = timeInterval;
 	ReportsCount = reportsCount;
 
-	ToBytes( data, startPos);
+	ToBytes(data, startPos);
 	//_reports_buffer = new unsigned char[reportsCount * PositionReport::BYTE_SIZE];
 }
 
@@ -31,13 +31,13 @@ void PositionMessage::FromBytes(unsigned char* data, unsigned long startPos) {
 	_startPos = startPos;
 	_buffer = data;
 	// HEADER
-	memcpy(&Epoch, &_buffer[0], sizeof(Epoch));  //bytes  0..3
+	memcpy(&Epoch, &_buffer[startPos], sizeof(Epoch));  //bytes  0..3
 
-	unsigned char timevalues = _buffer[4];  //byte 4
+	unsigned char timevalues = _buffer[startPos + 4];  //byte 4
 	TimeType = static_cast<TimeTypes>(timevalues >> 6);  //higher 2 bits
 	TimeInterval = timevalues & 63;  // lower 6 bits
 									  
-	unsigned char positionValues = _buffer[5];  //byte 5
+	unsigned char positionValues = _buffer[startPos + 5];  //byte 5
 	PositionType = static_cast<PositionReport::PositionTypes>(positionValues >> 6);  //higher 2 bits
 	ReportsCount = positionValues & 63;  // lower 6 bits
 
@@ -51,15 +51,15 @@ void PositionMessage::ToBytes(unsigned char* data, unsigned long startPos){
 	_buffer = data;
 
 	// HEADER
-	memcpy(&_buffer[0], (unsigned char*)&(Epoch), sizeof(Epoch));  //EPOCH bytes 0..3
+	memcpy(&_buffer[startPos], (unsigned char*)&(Epoch), sizeof(Epoch));  //EPOCH bytes 0..3
 
 	unsigned char timevalues;
 	timevalues = (TimeType << 6) + TimeInterval;
-	memcpy(&_buffer[4], (unsigned char*)&(timevalues), sizeof(timevalues));  //byte 4
+	memcpy(&_buffer[startPos + 4], (unsigned char*)&(timevalues), sizeof(timevalues));  //byte 4
 
 	unsigned char positionvalues;
 	positionvalues = (PositionType << 6) + ReportsCount;
-	memcpy(&_buffer[5], (unsigned char*)&(positionvalues), sizeof(positionvalues));  //byte 5
+	memcpy(&_buffer[startPos + 5], (unsigned char*)&(positionvalues), sizeof(positionvalues));  //byte 5
 
 	// LIST OF POSITION REPORTS
 

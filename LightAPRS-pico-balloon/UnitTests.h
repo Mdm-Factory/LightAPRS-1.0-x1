@@ -30,7 +30,7 @@ void UnitTests::GridIdConversion() {
 
 			unsigned char gridLoc2[2];
 			PositionReport::IdToGridLocator(gridLoc2, id);
-			Serial.printf("%c%c %d %d %c%c \n", gridLoc[0], gridLoc[1], id, PositionReport::GridLocatorToID(gridLoc), gridLoc2[0], gridLoc2[1]);
+			Serial.printf("%c%c %lu %lu %c%c \n", gridLoc[0], gridLoc[1], id, PositionReport::GridLocatorToID(gridLoc), gridLoc2[0], gridLoc2[1]);
 			id++;
 		}
 	}
@@ -40,21 +40,20 @@ void UnitTests::GridIdConversion() {
 void  UnitTests::ReportEncoding() {
 	Serial.printf("TestReportEncoding \n");
 	unsigned long epoch = 1581456190;
-	
+	unsigned short timeIntervalSeconds = 60 * 60 * 2;
 	unsigned char* buffer;
 	buffer = new unsigned char[PositionReport::ByteSize(PositionReport::PositionTypes::normalRes)];
 	//unsigned char buffer[4];
 
 	// Encode report
-	PositionReport report1(epoch, PositionReport::PositionTypes::normalRes, 60 * 60 * 2);  // time interval is 2 hours (in seconds)
-	report1.ToBytes(buffer, 0, epoch + 86400, 30.0, -97.0, 999);
-	Serial.printf("%d %c%c%c%c %d \n", report1.Utc, report1.GridLocation[0], report1.GridLocation[1], report1.GridLocation[2],
-		report1.GridLocation[3], report1.AltMeters);
+	PositionReport report1(epoch, PositionReport::PositionTypes::normalRes, timeIntervalSeconds);  // time interval is 2 hours (in seconds)
+	report1.ToBytes(buffer, 0, (unsigned long)(epoch + 86400), float(30.0), (float)(-97.0), (unsigned long)(999));
+	Serial.printf("%lu %c%c%c%c %d \n", report1.Utc, report1.GridLocation[0], report1.GridLocation[1], report1.GridLocation[2],report1.GridLocation[3], report1.AltMeters);
 
 	// Decode report
-	PositionReport report2(epoch, PositionReport::PositionTypes::normalRes, 60 * 60 * 2);  // time interval is 2 hours (in seconds)
+	PositionReport report2(epoch, PositionReport::PositionTypes::normalRes, timeIntervalSeconds);  // time interval is 2 hours (in seconds)
 	report2.FromBytes(buffer, 0);
-	Serial.printf("%d %c%c%c%c %d \n", report2.Utc, report1.GridLocation[0], report2.GridLocation[1], report2.GridLocation[2],
+	Serial.printf("%lu %c%c%c%c %d \n", report2.Utc, report1.GridLocation[0], report2.GridLocation[1], report2.GridLocation[2],
 		report2.GridLocation[3], report2.AltMeters);
 
 	delete buffer;  // Cleanup!
@@ -82,8 +81,8 @@ void  UnitTests::MessageEncoding() {
 	PositionMessage message2;
 	message2.FromBytes(data, 0);
 
-	Serial.printf("%d %d %d %d \n", message1.Epoch, message1.PositionType, message1.TimeType, message1.TimeInterval);
-	Serial.printf("%d %d %d %d \n", message2.Epoch, message2.PositionType, message2.TimeType, message2.TimeInterval);
+	Serial.printf("%lu %d %d %d \n", message1.Epoch, message1.PositionType, message1.TimeType, message1.TimeInterval);
+	Serial.printf("%lu %d %d %d \n", message2.Epoch, message2.PositionType, message2.TimeType, message2.TimeInterval);
 
 	delete buffer;  // Cleanup!
 	Serial.printf("\n");
@@ -106,18 +105,18 @@ void  UnitTests::MessageWithReportsEncoding() {
 	for (int i=0; i < reportCount; i++) {
 		unsigned long utc = epoch + message1.TimeIntervalSeconds() * i;  // for testing, make each report the next time slot
 		PositionReport report = message1.AddReport(utc, 30.0 + i*2, -97.0 + i*2, i);
-		Serial.printf("...AddReport %d %c%c%c%c %d \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
+		Serial.printf("...AddReport %lu %c%c%c%c %lu \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
 			report.GridLocation[3], report.AltMeters);
 	}
-	Serial.printf("%d Reports Added \n", message1.ReportsCount);
+	Serial.printf("%lu Reports Added \n", message1.ReportsCount);
 	
 	// Decode message
 	PositionMessage message2;
 	message2.FromBytes(buffer, 0);
-	Serial.printf("%d Reports Read \n", message2.ReportsCount);
+	Serial.printf("%lu Reports Read \n", message2.ReportsCount);
 	for (int i = 0; i < message2.ReportsCount; i++) {
 		PositionReport report = message2.ReadReport(i);
-		Serial.printf("...ReadReport %d %c%c%c%c %d \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
+		Serial.printf("...ReadReport %lu %c%c%c%c %lu \n", report.Utc, report.GridLocation[0], report.GridLocation[1], report.GridLocation[2],
 			report.GridLocation[3], report.AltMeters);
 	}
 
