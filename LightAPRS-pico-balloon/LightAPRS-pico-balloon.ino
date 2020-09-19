@@ -39,13 +39,13 @@
 //https://github.com/lightaprs/LightAPRS-1.0/wiki/Tips-&-Tricks-for-Pico-Balloons
 
 //****************************************************************************
-char  CallSign[7]="KI5GVH"; //DO NOT FORGET TO CHANGE YOUR CALLSIGN
+char  CallSign[7]="NOCALL"; //DO NOT FORGET TO CHANGE YOUR CALLSIGN
 int   CallNumber=11; //SSID http://www.aprs.org/aprs11/SSIDs.txt
 char  Symbol='O'; // '/O' for balloon, '/>' for car, for more info : http://www.aprs.org/symbols/symbols-new.txt
 bool  alternateSymbolTable = false ; //false = '/' , true = '\'
 
-char comment[50] = "http://bit.ly/KI5GVH11"; // Max 50 char
-char StatusMessage[50] = "LightAPRS-1.0-x1 mod by KI5GVH";
+char comment[50] = ""; // Max 50 char
+char StatusMessage[50] = "LightAPRS-1.0-x1 mod";
 //*****************************************************************************
 
 
