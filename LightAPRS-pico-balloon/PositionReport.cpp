@@ -19,7 +19,7 @@ void PositionReport::FromBytes(unsigned char* data, unsigned long startPos) {
 	memcpy(&TimeIndex, &_buffer[_startPos], sizeof(TimeIndex));  //bytes  0..1
 	memcpy(&gridBytes, &_buffer[_startPos + sizeof(TimeIndex)], sizeof(gridBytes));  //bytes 2..3
 
-	Utc = (unsigned long)(Epoch + (TimeIntervalSeconds * TimeIndex));
+	Utc = Epoch + (unsigned long)(TimeIntervalSeconds * TimeIndex);
 
 	unsigned char gridSubSqaure = gridBytes & 127;  // lower 7 bits
 	unsigned short gridId = gridBytes >> 7;
@@ -64,7 +64,7 @@ unsigned short PositionReport::ByteSize() {
 unsigned short PositionReport::ByteSize(PositionTypes positionType) {
 	switch (positionType) {
 	//case lowRes: return ?;
-	case normalRes: return 4;
+	case normalRes: return 5;
 	//case highRes: return ?;
 	}
 }

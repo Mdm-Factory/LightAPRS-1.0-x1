@@ -27,7 +27,7 @@ public:
 	// Time
 	unsigned long Epoch;
 	unsigned long Utc;
-	unsigned short TimeIntervalSeconds;  
+	unsigned long TimeIntervalSeconds;  
 	unsigned short TimeIndex;  // time slot  up to 65K
 
 	// Geo

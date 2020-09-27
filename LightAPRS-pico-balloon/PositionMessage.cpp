@@ -65,6 +65,20 @@ void PositionMessage::ToBytes(unsigned char* data, unsigned long startPos){
 
 }
 
+// Effectively clear the reports list by setting index back to zero.
+void PositionMessage::ClearReports() {
+	_lastIndexAdded = 0;
+}
+
+void PositionMessage::AddReport(unsigned char* data) {
+	unsigned short reportSize = PositionReport::ByteSize(PositionType);
+	unsigned long nextBytePosition = _startPos + HEADER_BYTE_SIZE + (reportSize * _lastIndexAdded);
+	for (int i = 1; i < reportSize; i++) {
+		_buffer[nextBytePosition + i] = data[i];
+	}
+	_lastIndexAdded++;
+}
+
 // Add next position report
 PositionReport PositionMessage::AddReport(unsigned long utc, float lat, float lon, unsigned short altMeters) {
 	
@@ -87,7 +101,7 @@ PositionReport PositionMessage::ReadReport(unsigned char index) {
 }
 
 // Convert Timetype/TimeInterval into interval in seconds
-int PositionMessage::TimeIntervalSeconds() {
+unsigned long PositionMessage::TimeIntervalSeconds() {
 	switch (TimeType) {
 		case seconds: return TimeInterval;
 		case minutes: return 60 * TimeInterval;
